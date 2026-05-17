@@ -10,16 +10,18 @@ function App({ children }: { children: React.ReactNode }) {
   const [count, setCount] = useState(0);
 
   return (
-    <>
-      <SidebarProvider>
-        <AppSidebar />
-        <main>
-          <SidebarTrigger />
-          {children}
-        </main>
-      </SidebarProvider>
-
-      <section id="center">
+    // <>
+    <SidebarProvider>
+      <AppSidebar />
+      <main>
+        <SidebarTrigger />
+        {children}
+      </main>
+    </SidebarProvider>
+  );
+}
+{
+  /* <section id="center">
         <div className="hero">
           <img src={heroImg} className="base" width="170" height="179" alt="" />
           <img src={reactLogo} className="framework" alt="React logo" />
@@ -125,8 +127,7 @@ function App({ children }: { children: React.ReactNode }) {
 
       <div className="ticks"></div>
       <section id="spacer"></section>
-    </>
-  );
+    </> */
 }
 
 export default App;
