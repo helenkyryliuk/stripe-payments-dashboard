@@ -1,23 +1,31 @@
-import { useState } from "react";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+// import { useState } from "react";
+import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "./AppSidebar.tsx";
-import reactLogo from "./assets/react.svg";
-import viteLogo from "./assets/vite.svg";
-import heroImg from "./assets/hero.png";
+// import reactLogo from "./assets/react.svg";
+// import viteLogo from "./assets/vite.svg";
+// import heroImg from "./assets/hero.png";
 import "./App.css";
+import { BugReportForm } from "./Transactions.tsx";
+import { SidebarInset } from "./components/ui/sidebar.tsx";
 
 function App({ children }: { children: React.ReactNode }) {
-  const [count, setCount] = useState(0);
+  // const [count, setCount] = useState(0);
 
   return (
-    // <>
-    <SidebarProvider>
-      <AppSidebar />
-      <main>
-        <SidebarTrigger />
-        {children}
-      </main>
-    </SidebarProvider>
+    <>
+      <SidebarProvider>
+        <AppSidebar />
+        <SidebarInset>
+          <main>
+            <BugReportForm></BugReportForm>
+          </main>
+        </SidebarInset>
+        {/* <main>
+          <SidebarTrigger />
+          {children}
+        </main> */}
+      </SidebarProvider>
+    </>
   );
 }
 {
