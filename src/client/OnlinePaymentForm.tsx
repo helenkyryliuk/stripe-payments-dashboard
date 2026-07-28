@@ -1,8 +1,13 @@
+import { useState } from "react";
+import {
+  PaymentElement,
+  useStripe,
+  useElements,
+} from "@stripe/react-stripe-js";
+import * as z from "zod";
 // import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 // import { toast } from "sonner"
-import * as z from "zod";
-
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -37,6 +42,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./components/ui/select";
+import { LockKeyholeIcon } from "lucide-react";
 
 const formSchema = z.object({
   title: z
@@ -49,7 +55,7 @@ const formSchema = z.object({
     .max(100, "Description must be at most 100 characters."),
 });
 
-export function BugReportForm() {
+export function OnlinePaymentForm() {
   const form = useForm<z.infer<typeof formSchema>>({
     // resolver: zodResolver(formSchema),
     defaultValues: {
@@ -58,71 +64,102 @@ export function BugReportForm() {
     },
   });
 
-  function onSubmit(data: z.infer<typeof formSchema>) {
-    // toast("You submitted the following values:", {
-    //   description: (
-    //     <pre className="mt-2 w-[320px] overflow-x-auto rounded-md bg-code p-4 text-code-foreground">
-    //       <code>{JSON.stringify(data, null, 2)}</code>
-    //     </pre>
-    //   ),
-    //   position: "bottom-right",
-    //   classNames: {
-    //     content: "flex flex-col gap-2",
-    //   },
-    //   style: {
-    //     "--border-radius": "calc(var(--radius)  + 4px)",
-    //   } as React.CSSProperties,
-    // });
-  }
+  const stripe = useStripe();
+  const elements = useElements();
+
+  const [message, setMessage] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    console.log(stripe);
+    console.log(elements);
+    if (!stripe || !elements) {
+      // Stripe.js hasn't yet loaded.
+      // Make sure to disable form submission until Stripe.js has loaded.
+      return;
+    }
+
+    setIsLoading(true);
+
+    const { error } = await stripe.confirmPayment({
+      elements,
+      confirmParams: {
+        // Make sure to change this to your payment completion page
+        return_url: "http://localhost:5000/complete",
+      },
+    });
+
+    // This point will only be reached if there is an immediate error when
+    // confirming the payment. Otherwise,  customer will be redirected to
+    // your `return_url`. For some payment methods like iDEAL,  customer will
+    // be redirected to an intermediate site first to authorize the payment, then
+    // redirected to the `return_url`.
+    if (error.type === "card_error" || error.type === "validation_error") {
+      setMessage(error.message);
+    } else {
+      setMessage("An unexpected error occurred.");
+    }
+
+    setIsLoading(false);
+  };
+
+  const paymentElementOptions = {
+    layout: "accordion",
+  };
 
   return (
-    <Card className="w-full sm:max-w-md">
+    <Card className="w-full sm:max-w-md m-7 mb-9 mt-5">
       <CardHeader>
         <CardTitle>Payment Method</CardTitle>
         <CardDescription>
-          All transactions are secure and encrypted{" "}
+          <FieldSeparator className="m-1" />
+          <div>
+            <LockKeyholeIcon /> Secure payment{" "}
+          </div>
+          Your payment information are encrypted and secure.{" "}
         </CardDescription>
       </CardHeader>
+
       <CardContent>
-        <form id="form-rhf-demo" onSubmit={form.handleSubmit(onSubmit)}>
-          <FieldGroup>
-            <Controller
-              name="title"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="form-rhf-demo-title">
-                    Name on Card
-                  </FieldLabel>
-                  <Input
-                    {...field}
-                    id="form-rhf-demo-title"
-                    aria-invalid={fieldState.invalid}
-                    placeholder="John Doe"
-                    autoComplete="off"
-                  />
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </Field>
+        <form id="payment-form" onSubmit={handleSubmit}>
+          <PaymentElement
+            id="payment-element"
+            options={paymentElementOptions}
+          />
+          <CardFooter className="flex-col gap-2">
+            <Button
+              type="submit"
+              form="form-rhf-demo"
+              className="w-full"
+              disabled={isLoading || !stripe || !elements}
+              id="submit"
+              onClick={handleSubmit}
+            >
+              {isLoading ? (
+                <div className="spinner" id="spinner"></div>
+              ) : (
+                "Pay now"
               )}
-            />
-          </FieldGroup>
-          {/* <div className="w-full max-w-md"> */}
-          {/* <form> */}
+            </Button>
+          </CardFooter>
+          {/* Show any error or success messages */}
+          {message && <div id="payment-message">{message}</div>}
+        </form>
+        {/* <form id="form-rhf-demo" onSubmit={form.handleSubmit(onSubmit)}>
           <FieldGroup>
             <FieldSet>
               <FieldGroup>
-                {/* <Field>
-                      <FieldLabel htmlFor="checkout-7j9-card-name-43j">
-                        Name on Card
-                      </FieldLabel>
-                      <Input
-                        id="checkout-7j9-card-name-43j"
-                        placeholder="Evil Rabbit"
-                        required
-                      />
-                    </Field> */}
+                <Field>
+                  <FieldLabel htmlFor="checkout-7j9-card-name-43j">
+                    Name on Card
+                  </FieldLabel>
+                  <Input
+                    id="checkout-7j9-card-name-43j"
+                    placeholder="John Doe"
+                    required
+                  />
+                </Field>
                 <Field>
                   <FieldLabel htmlFor="checkout-7j9-card-number-uw1">
                     Card Number
@@ -226,25 +263,8 @@ export function BugReportForm() {
               </FieldGroup>
             </FieldSet>
           </FieldGroup>
-          {/* </form>  */}
-          {/* </div> */}
-        </form>
+        </form> */}
       </CardContent>
-      <CardFooter className="flex-col gap-2">
-        <Field orientation="vertical">
-          <Button type="submit" form="form-rhf-demo" className="w-full">
-            Submit
-          </Button>
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => form.reset()}
-            className="w-full"
-          >
-            Reset
-          </Button>
-        </Field>
-      </CardFooter>
     </Card>
   );
 }
