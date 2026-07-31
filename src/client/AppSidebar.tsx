@@ -11,9 +11,18 @@ import {
   SidebarMenuButton,
   SidebarGroupContent,
 } from "./components/ui/sidebar";
+import { NavLink, useLocation } from "react-router-dom";
 import { House, ChartNoAxesCombined, SquarePlus } from "lucide-react";
 
+const navigationItems = [
+  { title: "Dashboard", url: "/", icon: House },
+  { title: "Create Payment", url: "/create-payment", icon: SquarePlus },
+  { title: "Analytics", url: "/analytics", icon: ChartNoAxesCombined },
+];
+
 export function AppSidebar() {
+  const location = useLocation();
+  console.log(location.pathname);
   return (
     <>
       <Sidebar>
@@ -42,24 +51,25 @@ export function AppSidebar() {
             </SidebarGroupAction>
             <SidebarGroupContent></SidebarGroupContent>
           </SidebarGroup> */}
-            <SidebarMenuItem>
-              <SidebarMenuButton isActive menu-button className="font-medium">
-                <House />
-                Dashboard
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-              <SidebarMenuButton className="font-medium">
-                <SquarePlus />
-                Create Payment
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-              <SidebarMenuButton className="font-medium">
-                <ChartNoAxesCombined />
-                Analytics
-              </SidebarMenuButton>
-            </SidebarMenuItem>
+
+            {navigationItems.map((item) => {
+              const isActive = location.pathname === item.url;
+              console.log(item.url);
+              return (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={isActive}
+                    className="font-medium"
+                  >
+                    <NavLink to={item.url}>
+                      <item.icon />
+                      <span>{item.title}</span>
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              );
+            })}
           </SidebarMenu>
         </SidebarContent>
         <SidebarFooter className="p-4 flex-row">

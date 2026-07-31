@@ -1,25 +1,47 @@
-import { StrictMode } from "react";
+import React from "react";
 import { createRoot } from "react-dom/client";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import "./index.css";
 import App from "./App.tsx";
+import { OnlinePaymentForm } from "./OnlinePaymentForm.tsx";
+import { CompletePage } from "./CompletePage.tsx";
+import { CreatePaymentPage } from "./CreatePaymentPage.tsx";
+import { OnlinePaymentCard } from "./OnlinePaymentCard.tsx";
+import { AnalyticsPage } from "./AnalyticsPage.tsx";
+
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <OnlinePaymentCard />,
+  },
+  {
+    path: "/pay/payments",
+    element: <App />,
+  },
+  {
+    path: "/create-payment",
+    element: <CreatePaymentPage />,
+  },
+  {
+    path: "/payments",
+    element: <OnlinePaymentForm />,
+  },
+  {
+    path: "/analytics",
+    element: <AnalyticsPage />,
+  },
+  {
+    path: "/complete",
+    element: <CompletePage />,
+  },
+  // {
+  //   path: "*", // Catch-all route for 404 pages
+  //   element: <NotFound />,
+  // },
+]);
 
 createRoot(document.getElementById("root")!).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
+  <React.StrictMode>
+    <RouterProvider router={router} />
+  </React.StrictMode>,
 );
-
-// The `tooltip` component has been added. Remember to wrap your app with the `TooltipProvider` component.
-
-// ```tsx title="app/layout.tsx"
-// import { TooltipProvider } from "@/components/ui/tooltip"
-
-// export default function RootLayout({ children }: { children: React.ReactNode }) {
-//   return (
-//     <html lang="en">
-//       <body>
-//         <TooltipProvider>{children}</TooltipProvider>
-//       </body>
-//     </html>
-//   )
-// }

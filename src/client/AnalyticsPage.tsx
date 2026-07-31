@@ -10,7 +10,7 @@ import {
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "./AppSidebar.tsx";
 
-export function OnlinePaymentCard() {
+export function AnalyticsPage() {
   return (
     <SidebarProvider>
       <AppSidebar />

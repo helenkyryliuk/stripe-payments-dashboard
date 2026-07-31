@@ -363,3 +363,89 @@ code {
     background-color: var(--sidebar-accent);
   }
 }
+
+.browser {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+}
+
+.browser-header {
+  height: 54px;
+
+  display: flex;
+  align-items: center;
+
+  padding: 0 20px;
+
+  border-bottom: 1px solid #e5e7eb;
+
+  position: relative;
+
+  background: #fafafb;
+}
+
+.browser-controls {
+  display: flex;
+  gap: 8px;
+}
+
+.dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.red {
+  background: #ff5f57;
+}
+
+.yellow {
+  background: #febc2e;
+}
+
+.green {
+  background: #28c840;
+}
+
+.browser-content {
+  padding: 50px 40px;
+
+  background: white;
+}
+
+.price {
+  font-size: 26px;
+
+  font-weight: 700;
+
+  margin: 18px 0;
+
+  color: #111827;
+}
+
+.customer {
+  display: flex;
+
+  align-items: center;
+
+  gap: 14px;
+
+  margin-top: 28px;
+}
+
+.browser-footer {
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: center;
+
+  padding: 18px 28px;
+
+  border-top: 1px solid #e5e7eb;
+
+  background: #fafafb;
+}
