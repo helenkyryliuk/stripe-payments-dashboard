@@ -11,7 +11,7 @@ import {
   SidebarMenuButton,
   SidebarGroupContent,
 } from "./components/ui/sidebar";
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation } from "react-router";
 import { House, ChartNoAxesCombined, SquarePlus } from "lucide-react";
 
 const navigationItems = [
