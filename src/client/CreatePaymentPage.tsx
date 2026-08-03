@@ -299,9 +299,7 @@ export function CreatePaymentPage() {
                           type="email"
                           placeholder="e.g. john@example.com"
                         />
-                        <InputGroupAddon>
-                          <MailIcon />
-                        </InputGroupAddon>
+                        <InputGroupAddon></InputGroupAddon>
                       </InputGroup>
                     </Field>
                     <FieldSet>

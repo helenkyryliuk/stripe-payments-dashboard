@@ -11,3 +11,64 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+model User {
+  id           String        @id @default(cuid())
+  name         String
+  email        String        @unique
+  paymentLinks PaymentLink[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model PaymentLink {
+  id          String  @id @default(cuid())
+  productName String
+  description String?
+  amount      Int
+  currency    String  @default("usd")
+  slug        String  @unique
+  downloadUrl String?
+  isActive    Boolean @default(true)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  payments Payment[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([createdAt])
+}
+
+model Payment {
+  id                    String        @id @default(cuid())
+  stripePaymentIntentId String        @unique
+  amount                Int
+  currency              String
+  status                PaymentStatus @default(PENDING)
+
+  customerName  String?
+  customerEmail String
+
+  paymentLinkId String
+  paymentLink   PaymentLink @relation(fields: [paymentLinkId], references: [id], onDelete: Restrict)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([paymentLinkId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+enum PaymentStatus {
+  PENDING
+  PROCESSING
+  SUCCEEDED
+  FAILED
+  CANCELED
+}

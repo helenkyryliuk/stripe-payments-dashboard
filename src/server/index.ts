@@ -3,6 +3,7 @@ import ViteExpress from "vite-express";
 import cors from "cors";
 import dotenv from "dotenv";
 import Stripe from "stripe";
+import { prisma } from "./lib/prisma.ts";
 const app = express();
 
 const PORT = process.env.PORT || 5000;
@@ -99,5 +100,24 @@ app.post("/api/create-payment-intent", async (req, res) => {
   } catch (error) {
     console.error("Stripe Error:", error);
     res.status(500).json({ error: error.message });
+  }
+});
+
+app.get("/api/health/db", async (_request, response) => {
+  try {
+    const userCount = await prisma.user.count();
+
+    response.json({
+      success: true,
+      database: "connected",
+      userCount,
+    });
+  } catch (error) {
+    console.error("Database health check failed:", error);
+
+    response.status(500).json({
+      success: false,
+      database: "disconnected",
+    });
   }
 });
