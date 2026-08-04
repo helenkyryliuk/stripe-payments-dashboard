@@ -1,5 +1,6 @@
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import * as z from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Field,
   FieldDescription,
@@ -31,9 +32,10 @@ import { AppSidebar } from "./AppSidebar.tsx";
 import { useState } from "react";
 import { DollarSign, MailIcon } from "lucide-react";
 import { CopyLinkInput } from "./CopyLinkInput.tsx";
+import { createPaymentLink } from "../api/paymentLinks.api.ts";
 
 const formSchema = z.object({
-  title: z
+  productName: z
     .string()
     .min(5, "Bug title must be at least 5 characters.")
     .max(32, "Bug title must be at most 32 characters."),
@@ -41,25 +43,32 @@ const formSchema = z.object({
     .string()
     .min(20, "Description must be at least 20 characters.")
     .max(100, "Description must be at most 100 characters."),
+  downloadUrl: z
+    .string()
+    .min(5, "Bug title must be at least 5 characters.")
+    .max(32, "Bug title must be at most 32 characters."),
+  amount: z.number().min(1, "Bug title must be at least 5 characters."),
 });
 
 export function CreatePaymentPage() {
   const [isLoading, setIsLoading] = useState();
   const form = useForm<z.infer<typeof formSchema>>({
-    // resolver: zodResolver(formSchema),
+    resolver: zodResolver(formSchema),
     defaultValues: {
-      title: "",
+      productName: "",
       description: "",
     },
   });
-  const onSubmit = async (e) => {
-    e.preventDefault();
-
-    setIsLoading(true);
-    //create submit logic
-    setIsLoading(false);
+  const onSubmit = async (data: z.infer<typeof formSchema>) => {
+    console.log(data);
+    await createPaymentLink({
+      productName: data.productName,
+      description: data.description,
+      amount: Math.round(data.amount * 100),
+      currency: "nzd",
+      downloadUrl: data.downloadUrl,
+    });
   };
-
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -262,16 +271,60 @@ export function CreatePaymentPage() {
                     <FieldSet>
                       <FieldGroup>
                         <div className="grid grid-cols-2 gap-4">
-                          <Field className="flex-2">
-                            <FieldLabel htmlFor="checkout-7j9-card-number-uw1">
-                              Customer Name
-                            </FieldLabel>
-                            <Input
-                              id="checkout-7j9-card-number-uw1"
-                              placeholder="e.g. John Smith"
-                              required
-                            />
-                          </Field>
+                          {/* <Field className="flex-2"> */}
+                          <Controller
+                            name="productName"
+                            control={form.control}
+                            render={({ field, fieldState }) => (
+                              <Field
+                                data-invalid={fieldState.invalid}
+                                className="flex-2"
+                              >
+                                <FieldLabel htmlFor="form-rhf-demo-title">
+                                  Payment for
+                                </FieldLabel>
+                                <Input
+                                  {...field}
+                                  id="form-rhf-demo-title"
+                                  aria-invalid={fieldState.invalid}
+                                  placeholder="Login button not working on mobile"
+                                  autoComplete="off"
+                                />
+                                {fieldState.invalid && (
+                                  <FieldError errors={[fieldState.error]} />
+                                )}
+                              </Field>
+                            )}
+                          />
+                          <Controller
+                            name="amount"
+                            control={form.control}
+                            render={({ field, fieldState }) => (
+                              <Field data-invalid={fieldState.invalid}>
+                                <FieldLabel htmlFor="form-rhf-demo-title">
+                                  Amount
+                                </FieldLabel>
+                                <Input
+                                  {...field}
+                                  id="form-rhf-demo-title"
+                                  type="number"
+                                  onChange={(e) => {
+                                    const val = e.target.value;
+                                    // Keep it as a number if valid, or null/empty string if blank
+                                    field.onChange(
+                                      val === "" ? "" : Number(val),
+                                    );
+                                  }}
+                                  aria-invalid={fieldState.invalid}
+                                  placeholder="Login button not working on mobile"
+                                  autoComplete="off"
+                                />
+                                {fieldState.invalid && (
+                                  <FieldError errors={[fieldState.error]} />
+                                )}
+                              </Field>
+                            )}
+                          />
                           <Field>
                             <FieldLabel htmlFor="checkout-7j9-card-number-uw1">
                               Amount
@@ -290,44 +343,62 @@ export function CreatePaymentPage() {
                       </FieldGroup>
                     </FieldSet>
 
-                    <Field>
-                      <FieldLabel htmlFor="checkout-7j9-card-number-uw1">
-                        Customer Email
-                      </FieldLabel>
-                      <InputGroup>
-                        <InputGroupInput
-                          type="email"
-                          placeholder="e.g. john@example.com"
-                        />
-                        <InputGroupAddon></InputGroupAddon>
-                      </InputGroup>
-                    </Field>
                     <FieldSet>
                       <FieldGroup>
-                        <Field>
-                          <FieldLabel htmlFor="checkout-7j9-card-name-43j">
-                            Payment for
-                          </FieldLabel>
-                          <Input
-                            id="checkout-7j9-card-name-43j"
-                            placeholder="Enter a product or service"
-                            required
-                          />
-                        </Field>
-                        <Field>
-                          <FieldLabel htmlFor="checkout-7j9-optional-comments">
-                            Description
-                          </FieldLabel>
-                          <Textarea
-                            id="checkout-7j9-optional-comments"
-                            placeholder="What is this payment for?"
-                            className="resize-none"
-                          />
-                          <FieldDescription>
-                            This will appear on the payment page and in
-                            receipts.
-                          </FieldDescription>
-                        </Field>
+                        <Controller
+                          name="description"
+                          control={form.control}
+                          render={({ field, fieldState }) => (
+                            <Field data-invalid={fieldState.invalid}>
+                              <FieldLabel htmlFor="form-rhf-demo-description">
+                                Description
+                              </FieldLabel>
+                              <InputGroup>
+                                <InputGroupTextarea
+                                  {...field}
+                                  id="form-rhf-demo-description"
+                                  placeholder="What is this payment for?"
+                                  rows={6}
+                                  className="min-h-24 resize-none"
+                                  aria-invalid={fieldState.invalid}
+                                />
+                                <InputGroupAddon align="block-end">
+                                  <InputGroupText className="tabular-nums">
+                                    {field.value.length}/100 characters
+                                  </InputGroupText>
+                                </InputGroupAddon>
+                              </InputGroup>
+                              <FieldDescription>
+                                This will appear on the payment page and in
+                                receipts.
+                              </FieldDescription>
+                              {fieldState.invalid && (
+                                <FieldError errors={[fieldState.error]} />
+                              )}
+                            </Field>
+                          )}
+                        />
+                        <Controller
+                          name="downloadUrl"
+                          control={form.control}
+                          render={({ field, fieldState }) => (
+                            <Field data-invalid={fieldState.invalid}>
+                              <FieldLabel htmlFor="form-rhf-demo-title">
+                                Download URL
+                              </FieldLabel>
+                              <Input
+                                {...field}
+                                id="form-rhf-demo-title"
+                                aria-invalid={fieldState.invalid}
+                                placeholder="Login button not working on mobile"
+                                autoComplete="off"
+                              />
+                              {fieldState.invalid && (
+                                <FieldError errors={[fieldState.error]} />
+                              )}
+                            </Field>
+                          )}
+                        />
                       </FieldGroup>
                     </FieldSet>
                   </FieldGroup>
@@ -340,7 +411,6 @@ export function CreatePaymentPage() {
                   className="w-full"
                   disabled={isLoading}
                   id="submit"
-                  onClick={onSubmit}
                 >
                   {isLoading ? (
                     <div className="spinner" id="spinner"></div>
@@ -352,7 +422,6 @@ export function CreatePaymentPage() {
             </Card>
             {/* </div> */}
 
-            {/* Right Column: Other Components */}
             <div className="w-120">
               <div className="browser">
                 <div className="browser-header">
@@ -398,3 +467,119 @@ export function CreatePaymentPage() {
     </SidebarProvider>
   );
 }
+
+// const formSchema = z.object({
+//   title: z
+//     .string()
+//     .min(5, "Bug title must be at least 5 characters.")
+//     .max(32, "Bug title must be at most 32 characters."),
+//   description: z
+//     .string()
+//     .min(20, "Description must be at least 20 characters.")
+//     .max(100, "Description must be at most 100 characters."),
+// });
+
+// export function BugReportForm() {
+//   const form = useForm<z.infer<typeof formSchema>>({
+//     resolver: zodResolver(formSchema),
+//     defaultValues: {
+//       title: "",
+//       description: "",
+//     },
+//   });
+
+//   function onSubmit(data: z.infer<typeof formSchema>) {
+//     toast("You submitted the following values:", {
+//       description: (
+//         <pre className="mt-2 w-[320px] overflow-x-auto rounded-md bg-code p-4 text-code-foreground">
+//           <code>{JSON.stringify(data, null, 2)}</code>
+//         </pre>
+//       ),
+//       position: "bottom-right",
+//       classNames: {
+//         content: "flex flex-col gap-2",
+//       },
+//       style: {
+//         "--border-radius": "calc(var(--radius)  + 4px)",
+//       } as React.CSSProperties,
+//     });
+//   }
+
+//   return (
+//     <Card className="w-full sm:max-w-md">
+//       <CardHeader>
+//         <CardTitle>Bug Report</CardTitle>
+//         <CardDescription>
+//           Help us improve by reporting bugs you encounter.
+//         </CardDescription>
+//       </CardHeader>
+//       <CardContent>
+//         <form id="form-rhf-demo" onSubmit={form.handleSubmit(onSubmit)}>
+//           <FieldGroup>
+//             <Controller
+//               name="title"
+//               control={form.control}
+//               render={({ field, fieldState }) => (
+//                 <Field data-invalid={fieldState.invalid}>
+//                   <FieldLabel htmlFor="form-rhf-demo-title">
+//                     Bug Title
+//                   </FieldLabel>
+//                   <Input
+//                     {...field}
+//                     id="form-rhf-demo-title"
+//                     aria-invalid={fieldState.invalid}
+//                     placeholder="Login button not working on mobile"
+//                     autoComplete="off"
+//                   />
+//                   {fieldState.invalid && (
+//                     <FieldError errors={[fieldState.error]} />
+//                   )}
+//                 </Field>
+//               )}
+//             />
+//             <Controller
+//               name="description"
+//               control={form.control}
+//               render={({ field, fieldState }) => (
+//                 <Field data-invalid={fieldState.invalid}>
+//                   <FieldLabel htmlFor="form-rhf-demo-description">
+//                     Description
+//                   </FieldLabel>
+//                   <InputGroup>
+//                     <InputGroupTextarea
+//                       {...field}
+//                       id="form-rhf-demo-description"
+//                       placeholder="I'm having an issue with the login button on mobile."
+//                       rows={6}
+//                       className="min-h-24 resize-none"
+//                       aria-invalid={fieldState.invalid}
+//                     />
+//                     <InputGroupAddon align="block-end">
+//                       <InputGroupText className="tabular-nums">
+//                         {field.value.length}/100 characters
+//                       </InputGroupText>
+//                     </InputGroupAddon>
+//                   </InputGroup>
+//                   <FieldDescription>
+//                     Include steps to reproduce, expected behavior, and what
+//                     actually happened.
+//                   </FieldDescription>
+//                   {fieldState.invalid && (
+//                     <FieldError errors={[fieldState.error]} />
+//                   )}
+//                 </Field>
+//               )}
+//             />
+//           </FieldGroup>
+//         </form>
+//       </CardContent>
+//       {/* <CardFooter>
+//         <Field orientation="horizontal">
+//           <Button type="submit" form="form-rhf-demo">
+//             Submit
+//           </Button>
+//         </Field>
+//       </CardFooter> */}
+//     </Card>
+//   );
+// }

@@ -1,28 +1,25 @@
 import express from "express";
 import ViteExpress from "vite-express";
-import cors from "cors";
 import dotenv from "dotenv";
 import Stripe from "stripe";
 import { prisma } from "./lib/prisma.ts";
+import paymentLinkRoutes from "./routes/paymentLinks.routes.ts";
+
 const app = express();
 
-const PORT = process.env.PORT || 5000;
+const PORT = Number(process.env.PORT) || 5000;
 
 dotenv.config();
 
-const stripe = new Stripe(process.env.VITE_STRIPE_SECRET_KEY);
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 // If you are testing with the CLI, find the secret by running 'stripe listen'.
 // If you are using an endpoint defined with the API or dashboard, look in
 // your webhook settings at https://dashboard.stripe.com/webhooks.
 //
 // Don't include webhook secrets in code.
-const endpointSecret = process.env.VITE_STRIPE_WEBHOOK_SECRET;
+const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
 // app.get("/api/message", (_, res) => res.send("Hello from Express!"));
-
-ViteExpress.listen(app, PORT, () =>
-  console.log(`Server is listening on port ${PORT}...`),
-);
 
 app.post(
   "/api/payments/webhook",
@@ -73,6 +70,8 @@ app.post(
 
 app.use(express.json()); // Essential to read incoming JSON if needed
 
+app.use("/api/payment-links", paymentLinkRoutes);
+
 const calculateOrderAmount = (items) => {
   // Calculate the order total on the server to prevent
   // people from directly manipulating the amount on the client
@@ -120,4 +119,8 @@ app.get("/api/health/db", async (_request, response) => {
       database: "disconnected",
     });
   }
+});
+
+ViteExpress.listen(app, PORT, () => {
+  console.log(`PayPilot API running at http://localhost:${PORT}`);
 });

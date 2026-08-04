@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@fontsource-variable/geist": "^5.2.8",
+    "@hookform/resolvers": "^5.7.1",
     "@prisma/adapter-pg": "^7.9.1",
     "@prisma/client": "^7.9.1",
     "@stripe/react-stripe-js": "^6.8.0",
@@ -30,7 +31,7 @@
     "radix-ui": "^1.4.3",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
-    "react-hook-form": "^7.75.0",
+    "react-hook-form": "^7.84.0",
     "react-router": "^8.3.0",
     "recharts": "^3.8.1",
     "shadcn": "^4.7.0",
@@ -43,6 +44,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.21.0",
+    "@types/express": "^5.0.6",
     "@types/node": "^24.13.3",
     "@types/pg": "^8.20.3",
     "@types/react": "^19.2.14",
