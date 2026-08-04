@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/card";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "./AppSidebar.tsx";
+import { Rocket } from "lucide-react";
 
 export function OnlinePaymentCard() {
   return (
@@ -17,6 +18,7 @@ export function OnlinePaymentCard() {
       <SidebarInset>
         <main>
           <h2 className="create-payment-header">Create Payment</h2>
+          <Rocket className="mt-2" />
           <div className="create-payment-description">
             Create a secure one-time payment request and share the link with
             your customer.
@@ -24,7 +26,7 @@ export function OnlinePaymentCard() {
           <div className="flex flex-row items-start gap-4 w-full">
             {/* Left Column: Your Form Section */}
             {/* <div className="flex-1 min-w-[200px]"> */}
-            <Card className="w-full sm:max-w-md m-7 mb-9 mt-5">
+            <Card className="w-full sm:max-w-md m-7 mb-9 mt-5 ">
               <CardHeader>
                 <CardTitle>Payment Details</CardTitle>
                 <CardDescription>

@@ -120,7 +120,6 @@
   /* width: 1126px; */
   max-width: 100%;
   margin: 0 auto;
-  text-align: center;
   border-inline: 1px solid var(--border);
   min-height: 100svh;
   display: flex;
@@ -273,9 +272,9 @@ code {
 }
 
 .create-payment-header {
+  display: flex;
   margin: 30px;
   margin-bottom: 5px;
-  text-align: left;
 }
 
 .create-payment-description {
@@ -448,4 +447,10 @@ code {
   border-top: 1px solid #e5e7eb;
 
   background: #fafafb;
+}
+
+.online-payment-rocket-icon {
+  margin-top: 5px;
+  font-size: 10px;
+  margin-left: 6px;
 }

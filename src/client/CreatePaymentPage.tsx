@@ -25,12 +25,11 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import { FieldLegend, FieldSeparator, FieldSet } from "@/components/ui/field";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "./AppSidebar.tsx";
 import { useState } from "react";
-import { DollarSign, MailIcon } from "lucide-react";
+import { Rocket } from "lucide-react";
 import { CopyLinkInput } from "./CopyLinkInput.tsx";
 import { createPaymentLink } from "../api/paymentLinks.api.ts";
 
@@ -74,10 +73,13 @@ export function CreatePaymentPage() {
       <AppSidebar />
       <SidebarInset>
         <main>
-          <h2 className="create-payment-header">Create Payment</h2>
+          <h2 className="create-payment-header">
+            Create Payment <Rocket />
+          </h2>
+
           <div className="create-payment-description">
-            Create a secure one-time payment request and share the link with
-            your customer.
+            Create a payment link for your digital product and start getting
+            paid.
           </div>
           <div className="max-w-xl mx-auto my-8 p-8 bg-white border border-gray-100 rounded-2xl shadow-sm font-sans">
             <h2 className="text-xl font-bold text-gray-900 mb-8">
@@ -255,16 +257,15 @@ export function CreatePaymentPage() {
               </button>
             </div>
           </div>
-
           <div className="flex flex-row items-start gap-4 w-full">
-            {/* Left Column: Your Form Section */}
-            {/* <div className="flex-1 min-w-[200px]"> */}
             <Card className="w-full sm:max-w-md m-7 mb-9 mt-5">
-              <h2 className="create-payment-header">Payment Details</h2>
-              <div className="create-payment-description">
-                Enter the payment information and configure your request.
-              </div>
-              <CopyLinkInput />
+              <CardHeader>
+                <CardTitle>Payment Details</CardTitle>
+                <CardDescription>
+                  Enter the payment information and configure your link.
+                </CardDescription>
+              </CardHeader>
+              {/* <CopyLinkInput /> */}
               <CardContent>
                 <form id="form-rhf-demo" onSubmit={form.handleSubmit(onSubmit)}>
                   <FieldGroup>
@@ -287,7 +288,7 @@ export function CreatePaymentPage() {
                                   {...field}
                                   id="form-rhf-demo-title"
                                   aria-invalid={fieldState.invalid}
-                                  placeholder="Login button not working on mobile"
+                                  placeholder="Enter a product or service"
                                   autoComplete="off"
                                 />
                                 {fieldState.invalid && (
@@ -304,41 +305,36 @@ export function CreatePaymentPage() {
                                 <FieldLabel htmlFor="form-rhf-demo-title">
                                   Amount
                                 </FieldLabel>
-                                <Input
-                                  {...field}
-                                  id="form-rhf-demo-title"
-                                  type="number"
-                                  onChange={(e) => {
-                                    const val = e.target.value;
-                                    // Keep it as a number if valid, or null/empty string if blank
-                                    field.onChange(
-                                      val === "" ? "" : Number(val),
-                                    );
-                                  }}
-                                  aria-invalid={fieldState.invalid}
-                                  placeholder="Login button not working on mobile"
-                                  autoComplete="off"
-                                />
+                                <InputGroup>
+                                  <InputGroupAddon>
+                                    <InputGroupText>$</InputGroupText>
+                                  </InputGroupAddon>
+                                  <InputGroupInput
+                                    {...field}
+                                    id="number"
+                                    type="number"
+                                    onChange={(e) => {
+                                      const val = e.target.value;
+                                      // Keep it as a number if valid, or null/empty string if blank
+                                      field.onChange(
+                                        val === "" ? "" : Number(val),
+                                      );
+                                    }}
+                                    aria-invalid={fieldState.invalid}
+                                    placeholder="0.00"
+                                    // autoComplete="off"
+                                  />
+                                  <InputGroupAddon align="inline-end">
+                                    <InputGroupText>NZD</InputGroupText>
+                                  </InputGroupAddon>
+                                </InputGroup>
+
                                 {fieldState.invalid && (
                                   <FieldError errors={[fieldState.error]} />
                                 )}
                               </Field>
                             )}
                           />
-                          <Field>
-                            <FieldLabel htmlFor="checkout-7j9-card-number-uw1">
-                              Amount
-                            </FieldLabel>
-                            <InputGroup>
-                              <InputGroupAddon>
-                                <InputGroupText>$</InputGroupText>
-                              </InputGroupAddon>
-                              <InputGroupInput placeholder="0.00" />
-                              <InputGroupAddon align="inline-end">
-                                <InputGroupText>NZD</InputGroupText>
-                              </InputGroupAddon>
-                            </InputGroup>
-                          </Field>
                         </div>
                       </FieldGroup>
                     </FieldSet>
@@ -420,7 +416,6 @@ export function CreatePaymentPage() {
                 </Button>
               </CardFooter>
             </Card>
-            {/* </div> */}
 
             <div className="w-120">
               <div className="browser">
@@ -467,119 +462,3 @@ export function CreatePaymentPage() {
     </SidebarProvider>
   );
 }
-
-// const formSchema = z.object({
-//   title: z
-//     .string()
-//     .min(5, "Bug title must be at least 5 characters.")
-//     .max(32, "Bug title must be at most 32 characters."),
-//   description: z
-//     .string()
-//     .min(20, "Description must be at least 20 characters.")
-//     .max(100, "Description must be at most 100 characters."),
-// });
-
-// export function BugReportForm() {
-//   const form = useForm<z.infer<typeof formSchema>>({
-//     resolver: zodResolver(formSchema),
-//     defaultValues: {
-//       title: "",
-//       description: "",
-//     },
-//   });
-
-//   function onSubmit(data: z.infer<typeof formSchema>) {
-//     toast("You submitted the following values:", {
-//       description: (
-//         <pre className="mt-2 w-[320px] overflow-x-auto rounded-md bg-code p-4 text-code-foreground">
-//           <code>{JSON.stringify(data, null, 2)}</code>
-//         </pre>
-//       ),
-//       position: "bottom-right",
-//       classNames: {
-//         content: "flex flex-col gap-2",
-//       },
-//       style: {
-//         "--border-radius": "calc(var(--radius)  + 4px)",
-//       } as React.CSSProperties,
-//     });
-//   }
-
-//   return (
-//     <Card className="w-full sm:max-w-md">
-//       <CardHeader>
-//         <CardTitle>Bug Report</CardTitle>
-//         <CardDescription>
-//           Help us improve by reporting bugs you encounter.
-//         </CardDescription>
-//       </CardHeader>
-//       <CardContent>
-//         <form id="form-rhf-demo" onSubmit={form.handleSubmit(onSubmit)}>
-//           <FieldGroup>
-//             <Controller
-//               name="title"
-//               control={form.control}
-//               render={({ field, fieldState }) => (
-//                 <Field data-invalid={fieldState.invalid}>
-//                   <FieldLabel htmlFor="form-rhf-demo-title">
-//                     Bug Title
-//                   </FieldLabel>
-//                   <Input
-//                     {...field}
-//                     id="form-rhf-demo-title"
-//                     aria-invalid={fieldState.invalid}
-//                     placeholder="Login button not working on mobile"
-//                     autoComplete="off"
-//                   />
-//                   {fieldState.invalid && (
-//                     <FieldError errors={[fieldState.error]} />
-//                   )}
-//                 </Field>
-//               )}
-//             />
-//             <Controller
-//               name="description"
-//               control={form.control}
-//               render={({ field, fieldState }) => (
-//                 <Field data-invalid={fieldState.invalid}>
-//                   <FieldLabel htmlFor="form-rhf-demo-description">
-//                     Description
-//                   </FieldLabel>
-//                   <InputGroup>
-//                     <InputGroupTextarea
-//                       {...field}
-//                       id="form-rhf-demo-description"
-//                       placeholder="I'm having an issue with the login button on mobile."
-//                       rows={6}
-//                       className="min-h-24 resize-none"
-//                       aria-invalid={fieldState.invalid}
-//                     />
-//                     <InputGroupAddon align="block-end">
-//                       <InputGroupText className="tabular-nums">
-//                         {field.value.length}/100 characters
-//                       </InputGroupText>
-//                     </InputGroupAddon>
-//                   </InputGroup>
-//                   <FieldDescription>
-//                     Include steps to reproduce, expected behavior, and what
-//                     actually happened.
-//                   </FieldDescription>
-//                   {fieldState.invalid && (
-//                     <FieldError errors={[fieldState.error]} />
-//                   )}
-//                 </Field>
-//               )}
-//             />
-//           </FieldGroup>
-//         </form>
-//       </CardContent>
-//       {/* <CardFooter>
-//         <Field orientation="horizontal">
-//           <Button type="submit" form="form-rhf-demo">
-//             Submit
-//           </Button>
-//         </Field>
-//       </CardFooter> */}
-//     </Card>
-//   );
-// }
