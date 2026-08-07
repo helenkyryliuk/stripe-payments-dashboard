@@ -1,0 +1,278 @@
+import {
+  Check,
+  CreditCard,
+  Download,
+  FileText,
+  HelpCircle,
+  Mail,
+  ReceiptText,
+  ShieldCheck,
+} from "lucide-react";
+
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+
+type PaymentSuccessPageProps = {
+  productName: string;
+  amount: number;
+  currency?: string;
+  paymentIntentId: string;
+  customerEmail: string;
+  paymentDate: string;
+  cardBrand?: string;
+  cardLast4?: string;
+  downloadUrl?: string;
+  supportEmail?: string;
+};
+
+export function PaymentSuccessPage({
+  productName,
+  amount,
+  currency = "NZD",
+  paymentIntentId,
+  customerEmail,
+  paymentDate,
+  cardBrand = "Visa",
+  cardLast4 = "1234",
+  downloadUrl,
+  supportEmail = "support@paypilot.app",
+}: PaymentSuccessPageProps) {
+  const formattedAmount = new Intl.NumberFormat("en-NZ", {
+    style: "currency",
+    currency,
+  }).format(amount);
+
+  const handleDownload = () => {
+    if (!downloadUrl) return;
+
+    window.open(downloadUrl, "_blank", "noopener,noreferrer");
+  };
+
+  const handleDownloadReceipt = () => {
+    // Replace this later with your receipt PDF endpoint.
+    window.print();
+  };
+
+  return (
+    <main className="min-h-screen bg-muted/30 px-4 py-6 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-5xl">
+        <header className="mb-6 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="flex size-10 items-center justify-center rounded-xl bg-primary text-primary-foreground">
+              <span className="text-lg font-bold">P</span>
+            </div>
+
+            <span className="text-2xl font-bold tracking-tight">PayPilot</span>
+          </div>
+
+          <div className="hidden items-center gap-2 text-sm text-muted-foreground sm:flex">
+            <ShieldCheck className="size-4" />
+            Secure payment powered by Stripe
+          </div>
+        </header>
+
+        <Card className="overflow-hidden shadow-sm">
+          <CardContent className="p-0">
+            <section className="px-6 py-12 text-center sm:px-10">
+              <div className="mx-auto mb-6 flex size-24 items-center justify-center rounded-full bg-emerald-50">
+                <div className="flex size-14 items-center justify-center rounded-full bg-emerald-500 text-white shadow-sm">
+                  <Check className="size-8" strokeWidth={3} />
+                </div>
+              </div>
+
+              <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
+                Payment successful!
+              </h1>
+
+              <p className="mt-3 text-muted-foreground">
+                Thank you for your purchase. Your payment has been processed
+                successfully.
+              </p>
+            </section>
+
+            <Separator />
+
+            <section className="grid gap-8 px-6 py-8 sm:px-10 lg:grid-cols-[1fr_340px]">
+              <div>
+                <h2 className="mb-5 text-lg font-semibold">Payment summary</h2>
+
+                <dl className="space-y-5">
+                  <SummaryRow
+                    icon={<FileText className="size-4" />}
+                    label="Product"
+                    value={productName}
+                  />
+
+                  <SummaryRow
+                    icon={<ReceiptText className="size-4" />}
+                    label="Amount"
+                    value={formattedAmount}
+                  />
+
+                  <SummaryRow
+                    icon={<CreditCard className="size-4" />}
+                    label="Payment ID"
+                    value={paymentIntentId}
+                    mono
+                  />
+
+                  <SummaryRow
+                    icon={<ReceiptText className="size-4" />}
+                    label="Date"
+                    value={paymentDate}
+                  />
+
+                  <SummaryRow
+                    icon={<CreditCard className="size-4" />}
+                    label="Payment method"
+                    value={`${cardBrand} •••• ${cardLast4}`}
+                  />
+                </dl>
+              </div>
+
+              <div className="space-y-4">
+                <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-5">
+                  <div className="flex gap-3">
+                    <div className="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-white">
+                      <Check className="size-4" />
+                    </div>
+
+                    <div>
+                      <p className="font-semibold text-emerald-900">
+                        Payment complete
+                      </p>
+
+                      <p className="mt-2 text-sm leading-6 text-emerald-800">
+                        A confirmation has been sent to{" "}
+                        <span className="font-medium">{customerEmail}</span>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full"
+                  onClick={handleDownloadReceipt}
+                >
+                  <Download className="size-4" />
+                  Download receipt
+                </Button>
+              </div>
+            </section>
+
+            {downloadUrl && (
+              <>
+                <Separator />
+
+                <section className="px-6 py-8 sm:px-10">
+                  <div className="rounded-2xl border bg-primary/5 p-6 sm:flex sm:items-center sm:justify-between sm:gap-8">
+                    <div className="flex gap-4">
+                      <div className="flex size-14 shrink-0 items-center justify-center rounded-xl bg-background text-primary shadow-sm">
+                        <FileText className="size-7" />
+                      </div>
+
+                      <div>
+                        <h2 className="text-lg font-semibold">
+                          Your download is ready
+                        </h2>
+
+                        <p className="mt-1 text-sm text-muted-foreground">
+                          You can now download your purchased product.
+                        </p>
+                      </div>
+                    </div>
+
+                    <Button
+                      type="button"
+                      className="mt-5 w-full sm:mt-0 sm:w-auto"
+                      onClick={handleDownload}
+                    >
+                      <Download className="size-4" />
+                      Download {productName}
+                    </Button>
+                  </div>
+                </section>
+              </>
+            )}
+
+            <Separator />
+
+            <section className="px-6 py-8 sm:px-10">
+              <div className="flex flex-col gap-5 rounded-xl border p-5 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex gap-3">
+                  <HelpCircle className="mt-0.5 size-5 text-muted-foreground" />
+
+                  <div>
+                    <p className="font-medium">Need help?</p>
+
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      Contact the seller if you have any questions about your
+                      purchase.
+                    </p>
+                  </div>
+                </div>
+
+                <Button variant="outline" asChild>
+                  <a href={`mailto:${supportEmail}`}>
+                    <Mail className="size-4" />
+                    Contact support
+                  </a>
+                </Button>
+              </div>
+            </section>
+          </CardContent>
+        </Card>
+
+        <footer className="mt-6 text-center text-sm text-muted-foreground">
+          <p>
+            Need help? Contact us at{" "}
+            <a
+              href={`mailto:${supportEmail}`}
+              className="font-medium text-primary hover:underline"
+            >
+              {supportEmail}
+            </a>
+          </p>
+
+          <p className="mt-2">
+            © {new Date().getFullYear()} PayPilot. All rights reserved.
+          </p>
+        </footer>
+      </div>
+    </main>
+  );
+}
+
+type SummaryRowProps = {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+  mono?: boolean;
+};
+
+function SummaryRow({ icon, label, value, mono = false }: SummaryRowProps) {
+  return (
+    <div className="grid grid-cols-[minmax(130px,0.8fr)_1fr] items-start gap-4">
+      <dt className="flex items-center gap-3 text-sm text-muted-foreground">
+        <span className="flex size-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
+          {icon}
+        </span>
+
+        {label}
+      </dt>
+
+      <dd
+        className={
+          mono
+            ? "break-all text-right font-mono text-sm font-medium"
+            : "text-right text-sm font-medium"
+        }
+      >
+        {value}
+      </dd>
+    </div>
+  );
+}

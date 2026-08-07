@@ -24,8 +24,8 @@ const router = createBrowserRouter([
     element: <CreatePaymentPage />,
   },
   {
-    path: "/payments",
-    element: <OnlinePaymentForm />,
+    path: "/pay/:slug",
+    element: <App />,
   },
   {
     path: "/analytics",

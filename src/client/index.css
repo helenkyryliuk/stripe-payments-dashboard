@@ -450,7 +450,27 @@ code {
 }
 
 .online-payment-rocket-icon {
+  color: var(--sidebar-accent-foreground);
   margin-top: 5px;
   font-size: 10px;
   margin-left: 6px;
+}
+
+.online-payment-link-icon {
+  color: var(--sidebar-accent-foreground);
+}
+
+.icon-circle-wrapper {
+  width: 44px;
+  height: 44px;
+  background-color: var(--sidebar-accent);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-right: 15px;
+}
+.link {
+  border-color: var(--border);
 }

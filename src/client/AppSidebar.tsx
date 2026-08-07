@@ -12,17 +12,22 @@ import {
   SidebarGroupContent,
 } from "./components/ui/sidebar";
 import { NavLink, useLocation } from "react-router";
-import { House, ChartNoAxesCombined, SquarePlus } from "lucide-react";
+import {
+  House,
+  ChartNoAxesCombined,
+  SquarePlus,
+  ExternalLink,
+} from "lucide-react";
 
 const navigationItems = [
   { title: "Dashboard", url: "/", icon: House },
   { title: "Create Payment", url: "/create-payment", icon: SquarePlus },
   { title: "Analytics", url: "/analytics", icon: ChartNoAxesCombined },
+  { title: "Payment Links", url: "/payment-links", icon: ExternalLink },
 ];
 
 export function AppSidebar() {
   const location = useLocation();
-  console.log(location.pathname);
   return (
     <>
       <Sidebar>
