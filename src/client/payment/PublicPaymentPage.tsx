@@ -1,242 +1,159 @@
-import { FormEvent, useState } from "react";
-import {
-  PaymentElement,
-  useElements,
-  useStripe,
-} from "@stripe/react-stripe-js";
-import type { StripePaymentElementOptions } from "@stripe/stripe-js";
-import {
-  AlertCircle,
-  ArrowLeft,
-  LoaderCircle,
-  LockKeyhole,
-  Mail,
-  UserRound,
-} from "lucide-react";
+import { useEffect, useState } from "react";
+import { Elements } from "@stripe/react-stripe-js";
+import type { StripeElementsOptions } from "@stripe/stripe-js";
+import { AlertCircle, LoaderCircle, Send, ShieldCheck } from "lucide-react";
+import { useParams } from "react-router-dom";
 
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import type { PublicPaymentLink } from "@/types/payment-link";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { PaymentForm } from "@/components/payment/PaymentForm";
+import { ProductSummary } from "@/components/payment/ProductSummary";
+import { payPilotAppearance, stripePromise } from "@/lib/stripe";
+import { getPaymentPage } from "@/services/payment-links";
+import type { PaymentPageData } from "@/types/payment-link";
 
-type PaymentFormProps = {
-  paymentLink: PublicPaymentLink;
-};
+export function PublicPaymentPage() {
+  const { slug } = useParams<{ slug: string }>();
 
-const paymentElementOptions: StripePaymentElementOptions = {
-  layout: {
-    type: "tabs",
-    defaultCollapsed: false,
-  },
-
-  fields: {
-    billingDetails: {
-      name: "never",
-      email: "never",
-      address: "if_required",
-    },
-  },
-};
-
-export function PaymentForm({ paymentLink }: PaymentFormProps) {
-  const stripe = useStripe();
-  const elements = useElements();
-
-  const [customerName, setCustomerName] = useState("");
-  const [customerEmail, setCustomerEmail] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [pageData, setPageData] = useState<PaymentPageData>();
   const [errorMessage, setErrorMessage] = useState<string>();
+  const [isLoading, setIsLoading] = useState(true);
 
-  const formattedAmount = new Intl.NumberFormat("en-NZ", {
-    style: "currency",
-    currency: paymentLink.currency.toUpperCase(),
-  }).format(paymentLink.amount);
-
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-
-    if (!stripe || !elements) {
+  useEffect(() => {
+    if (!slug) {
+      setErrorMessage("Payment link is missing.");
+      setIsLoading(false);
       return;
     }
 
-    const trimmedName = customerName.trim();
-    const trimmedEmail = customerEmail.trim();
+    const controller = new AbortController();
 
-    if (!trimmedName || !trimmedEmail) {
-      setErrorMessage("Enter your name and email address to continue.");
-      return;
+    async function loadPaymentPage() {
+      try {
+        setIsLoading(true);
+        setErrorMessage(undefined);
+
+        const data = await getPaymentPage(slug!);
+
+        if (!controller.signal.aborted) {
+          setPageData(data);
+        }
+      } catch (error) {
+        if (!controller.signal.aborted) {
+          setErrorMessage(
+            error instanceof Error
+              ? error.message
+              : "Unable to load this payment page.",
+          );
+        }
+      } finally {
+        if (!controller.signal.aborted) {
+          setIsLoading(false);
+        }
+      }
     }
 
-    setIsSubmitting(true);
-    setErrorMessage(undefined);
+    void loadPaymentPage();
 
-    const returnUrl = new URL(
-      `/pay/${paymentLink.slug}/success`,
-      window.location.origin,
-    );
+    return () => {
+      controller.abort();
+    };
+  }, [slug]);
 
-    returnUrl.searchParams.set("email", trimmedEmail);
-
-    const { error, paymentIntent } = await stripe.confirmPayment({
-      elements,
-
-      confirmParams: {
-        return_url: returnUrl.toString(),
-
-        payment_method_data: {
-          billing_details: {
-            name: trimmedName,
-            email: trimmedEmail,
-          },
-        },
-      },
-
-      redirect: "if_required",
-    });
-
-    if (error) {
-      setErrorMessage(error.message ?? "Your payment could not be completed.");
-      setIsSubmitting(false);
-      return;
-    }
-
-    if (paymentIntent?.status === "succeeded") {
-      window.location.assign(
-        `/pay/${paymentLink.slug}/success?payment_intent=${paymentIntent.id}`,
-      );
-      return;
-    }
-
-    if (paymentIntent?.status === "processing") {
-      window.location.assign(
-        `/pay/${paymentLink.slug}/success?payment_intent=${paymentIntent.id}`,
-      );
-      return;
-    }
-
-    setErrorMessage("Your payment has not been completed. Please try again.");
-    setIsSubmitting(false);
+  if (isLoading) {
+    return <PaymentPageLoading />;
   }
 
+  if (errorMessage || !pageData) {
+    return (
+      <PaymentPageError
+        message={errorMessage ?? "This payment page is unavailable."}
+      />
+    );
+  }
+
+  const elementsOptions: StripeElementsOptions = {
+    clientSecret: pageData.clientSecret,
+    appearance: payPilotAppearance,
+  };
+
   return (
-    <Card className="border-border/70 shadow-sm">
-      <CardHeader className="px-6 pb-2 pt-7 sm:px-10 sm:pt-10">
-        <CardTitle className="text-2xl sm:text-3xl">
-          Complete your payment
-        </CardTitle>
+    <Elements stripe={stripePromise} options={elementsOptions}>
+      <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(109,74,255,0.09),_transparent_35%),radial-gradient(circle_at_bottom_right,_rgba(99,102,241,0.08),_transparent_35%)] px-4 py-6 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl">
+          <header className="mb-6 flex items-center justify-between rounded-2xl border bg-background/90 px-5 py-4 shadow-sm backdrop-blur sm:px-8">
+            <div className="flex items-center gap-3">
+              <div className="flex size-10 rotate-[-10deg] items-center justify-center rounded-xl bg-primary text-primary-foreground">
+                <Send className="size-5" />
+              </div>
 
-        <CardDescription className="text-base">
-          Enter your details below to complete your purchase.
-        </CardDescription>
-      </CardHeader>
-
-      <CardContent className="px-6 pb-8 pt-6 sm:px-10 sm:pb-10">
-        <form className="space-y-6" onSubmit={handleSubmit}>
-          <div className="space-y-2">
-            <Label htmlFor="customer-email">Email address</Label>
-
-            <div className="relative">
-              <Mail
-                aria-hidden="true"
-                className="absolute left-4 top-1/2 size-5 -translate-y-1/2 text-muted-foreground"
-              />
-
-              <Input
-                id="customer-email"
-                type="email"
-                autoComplete="email"
-                placeholder="you@example.com"
-                className="h-12 pl-12"
-                value={customerEmail}
-                onChange={(event) => setCustomerEmail(event.target.value)}
-                disabled={isSubmitting}
-                required
-              />
+              <span className="text-2xl font-bold tracking-tight">
+                PayPilot
+              </span>
             </div>
+
+            <div className="hidden items-center gap-2 text-sm text-muted-foreground sm:flex">
+              <ShieldCheck className="size-4" />
+              Secure payment powered by Stripe
+            </div>
+          </header>
+
+          <div className="grid gap-6 lg:grid-cols-[380px_minmax(0,1fr)]">
+            <ProductSummary paymentLink={pageData.paymentLink} />
+
+            <PaymentForm paymentLink={pageData.paymentLink} />
           </div>
 
-          <div className="space-y-3">
-            <Label>Payment information</Label>
-
-            <div className="rounded-lg border bg-background p-4">
-              <PaymentElement options={paymentElementOptions} />
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="customer-name">Cardholder name</Label>
-
-            <div className="relative">
-              <UserRound
-                aria-hidden="true"
-                className="absolute left-4 top-1/2 size-5 -translate-y-1/2 text-muted-foreground"
-              />
-
-              <Input
-                id="customer-name"
-                type="text"
-                autoComplete="cc-name"
-                placeholder="Name on card"
-                className="h-12 pl-12"
-                value={customerName}
-                onChange={(event) => setCustomerName(event.target.value)}
-                disabled={isSubmitting}
-                required
-              />
-            </div>
-          </div>
-
-          {errorMessage && (
-            <Alert variant="destructive">
-              <AlertCircle className="size-4" />
-
-              <AlertDescription>{errorMessage}</AlertDescription>
-            </Alert>
-          )}
-
-          <Button
-            type="submit"
-            size="lg"
-            className="h-14 w-full bg-gradient-to-r from-violet-600 to-indigo-600 text-base shadow-sm hover:from-violet-700 hover:to-indigo-700"
-            disabled={!stripe || !elements || isSubmitting}
-          >
-            {isSubmitting ? (
-              <>
-                <LoaderCircle className="size-5 animate-spin" />
-                Processing payment...
-              </>
-            ) : (
-              <>
-                <LockKeyhole className="size-5" />
-                Pay NZD {formattedAmount.replace("NZ$", "$")}
-              </>
+          <footer className="mt-8 text-center text-sm text-muted-foreground">
+            {pageData.paymentLink.supportEmail && (
+              <p>
+                Need help? Contact us at{" "}
+                <a
+                  href={`mailto:${pageData.paymentLink.supportEmail}`}
+                  className="font-medium text-primary hover:underline"
+                >
+                  {pageData.paymentLink.supportEmail}
+                </a>
+              </p>
             )}
-          </Button>
 
-          {paymentLink.productUrl && (
-            <Button
-              type="button"
-              variant="ghost"
-              className="w-full text-primary"
-              disabled={isSubmitting}
-              onClick={() => {
-                window.location.assign(paymentLink.productUrl!);
-              }}
-            >
-              <ArrowLeft className="size-4" />
-              Back to product
-            </Button>
-          )}
-        </form>
-      </CardContent>
-    </Card>
+            <p className="mt-2">
+              © {new Date().getFullYear()} PayPilot. All rights reserved.
+            </p>
+          </footer>
+        </div>
+      </main>
+    </Elements>
+  );
+}
+
+function PaymentPageLoading() {
+  return (
+    <main className="flex min-h-screen items-center justify-center bg-muted/30">
+      <div className="text-center">
+        <LoaderCircle className="mx-auto size-8 animate-spin text-primary" />
+
+        <p className="mt-4 text-sm text-muted-foreground">
+          Loading secure payment page...
+        </p>
+      </div>
+    </main>
+  );
+}
+
+type PaymentPageErrorProps = {
+  message: string;
+};
+
+function PaymentPageError({ message }: PaymentPageErrorProps) {
+  return (
+    <main className="flex min-h-screen items-center justify-center bg-muted/30 px-4">
+      <Alert variant="destructive" className="max-w-md">
+        <AlertCircle className="size-4" />
+
+        <AlertTitle>Payment page unavailable</AlertTitle>
+
+        <AlertDescription>{message}</AlertDescription>
+      </Alert>
+    </main>
   );
 }

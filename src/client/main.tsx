@@ -16,10 +16,6 @@ const router = createBrowserRouter([
     element: <OnlinePaymentCard />,
   },
   {
-    path: "/pay/payments",
-    element: <App />,
-  },
-  {
     path: "/create-payment",
     element: <CreatePaymentPage />,
   },
