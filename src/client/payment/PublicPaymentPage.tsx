@@ -2,13 +2,13 @@ import { useEffect, useState } from "react";
 import { Elements } from "@stripe/react-stripe-js";
 import type { StripeElementsOptions } from "@stripe/stripe-js";
 import { AlertCircle, LoaderCircle, Send, ShieldCheck } from "lucide-react";
-import { useParams } from "react-router-dom";
+import { useParams } from "react-router";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { PaymentForm } from "@/components/payment/PaymentForm";
-import { ProductSummary } from "@/components/payment/ProductSummary";
+import { PaymentForm } from "./PaymentForm";
+import { ProductSummary } from "./ProductSummary";
 import { payPilotAppearance, stripePromise } from "@/lib/stripe";
-import { getPaymentPage } from "@/services/payment-links";
+import { getPaymentPage } from "@/services/paymentLinks";
 import type { PaymentPageData } from "@/types/payment-link";
 
 export function PublicPaymentPage() {
