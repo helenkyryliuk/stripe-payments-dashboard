@@ -9,6 +9,7 @@ import { CompletePage } from "./CompletePage.tsx";
 import { CreatePaymentPage } from "./CreatePaymentPage.tsx";
 import { OnlinePaymentCard } from "./OnlinePaymentCard.tsx";
 import { AnalyticsPage } from "./AnalyticsPage.tsx";
+import { PublicPaymentPage } from "./payment/PublicPaymentPage.tsx";
 
 const router = createBrowserRouter([
   {
@@ -21,7 +22,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/pay/:slug",
-    element: <App />,
+    element: <PublicPaymentPage />,
   },
   {
     path: "/analytics",

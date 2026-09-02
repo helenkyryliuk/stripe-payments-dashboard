@@ -15,10 +15,3 @@ export type PaymentPageData = {
   paymentLink: PublicPaymentLink;
   clientSecret: string;
 };
-
-export type PaymentLinkParams = {
-  slug: string;
-};
-export type CreatePaymentIntentResponse = {
-  clientSecret: string;
-};
