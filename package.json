@@ -5,11 +5,11 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "node src/server/index.ts",
+    "dev": "node src/server/main.ts",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "start": "NODE_ENV=production node server/index.js"
+    "start": "NODE_ENV=production node src/server/main.ts"
   },
   "dependencies": {
     "@fontsource-variable/geist": "^5.2.8",

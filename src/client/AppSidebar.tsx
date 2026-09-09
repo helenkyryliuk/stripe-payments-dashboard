@@ -11,13 +11,14 @@ import {
   SidebarMenuButton,
   SidebarGroupContent,
 } from "./components/ui/sidebar";
-import { NavLink, useLocation } from "react-router";
+import { NavLink, useLocation, BrowserRouter } from "react-router";
 import {
   House,
   ChartNoAxesCombined,
   SquarePlus,
   ExternalLink,
 } from "lucide-react";
+import { useEffect, useState } from "react";
 
 const navigationItems = [
   { title: "Dashboard", url: "/", icon: House },
@@ -27,9 +28,13 @@ const navigationItems = [
 ];
 
 export function AppSidebar() {
+  const [loc, setLoc] = useState();
   const location = useLocation();
+  useEffect(() => {
+    setLoc(location.pathname);
+  }, [location]);
   return (
-    <>
+    <BrowserRouter>
       <Sidebar>
         <SidebarHeader className="p-4 flex-row pb-0">
           <div className="payflow-icon-wrapper">
@@ -49,17 +54,8 @@ export function AppSidebar() {
         </SidebarHeader>
         <SidebarContent>
           <SidebarMenu className="p-4">
-            {/* <SidebarGroup>
-            <SidebarGroupLabel>Application</SidebarGroupLabel>
-            <SidebarGroupAction>
-              <Plus /> <span className="sr-only">Add Project</span>
-            </SidebarGroupAction>
-            <SidebarGroupContent></SidebarGroupContent>
-          </SidebarGroup> */}
-
             {navigationItems.map((item) => {
-              const isActive = location.pathname === item.url;
-              console.log(item.url);
+              const isActive = loc === item.url;
               return (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton
@@ -87,6 +83,6 @@ export function AppSidebar() {
           </div>
         </SidebarFooter>
       </Sidebar>
-    </>
+    </BrowserRouter>
   );
 }

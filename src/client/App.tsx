@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { Elements } from "@stripe/react-stripe-js";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "./AppSidebar.tsx";
-import "./App.css";
 import { OnlinePaymentForm } from "./OnlinePaymentForm.tsx";
 
 const appearance: Appearance | undefined = {

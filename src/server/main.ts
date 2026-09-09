@@ -11,15 +11,21 @@ const PORT = Number(process.env.PORT) || 5000;
 
 dotenv.config();
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+const secretKey = process.env.STRIPE_SECRET_KEY;
+
+if (!secretKey) {
+  throw new Error(
+    "❌ CRITICAL: STRIPE_SECRET_KEY is missing from your .env file!",
+  );
+}
+
+const stripe = new Stripe(secretKey);
 // If you are testing with the CLI, find the secret by running 'stripe listen'.
 // If you are using an endpoint defined with the API or dashboard, look in
 // your webhook settings at https://dashboard.stripe.com/webhooks.
 //
 // Don't include webhook secrets in code.
 const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
-
-// app.get("/api/message", (_, res) => res.send("Hello from Express!"));
 
 app.post(
   "/api/payments/webhook",
@@ -125,13 +131,13 @@ ViteExpress.listen(app, PORT, () => {
   console.log(`PayPilot API running at http://localhost:${PORT}`);
 });
 
-// 3. Catch-all for undefined routes (404)
-app.use((req, res, next) => {
-  res.status(404).json({ message: "Route not found" });
-});
+// // 3. Catch-all for undefined routes (404)
+// app.use((req, res, next) => {
+//   res.status(404).json({ message: "Route not found" });
+// });
 
-// 4. Global Error Handler
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ message: "Something went wrong on the server!" });
-});
+// // 4. Global Error Handler
+// app.use((err, req, res, next) => {
+//   console.error(err.stack);
+//   res.status(500).json({ message: "Something went wrong on the server!" });
+// });

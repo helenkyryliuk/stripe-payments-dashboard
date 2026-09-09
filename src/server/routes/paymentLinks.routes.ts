@@ -6,7 +6,7 @@ import {
   getPaymentLinks,
   updatePaymentLinkStatus,
 } from "../controllers/paymentLinks.controller.ts";
-import { createPaymentIntent } from "../controllers/payments.controller";
+import { createPaymentIntent } from "../controllers/payments.controller.ts";
 
 const router = Router();
 
