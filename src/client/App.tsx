@@ -3,7 +3,6 @@ import { loadStripe, type Appearance } from "@stripe/stripe-js";
 import { useEffect, useState } from "react";
 import { Elements } from "@stripe/react-stripe-js";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
-import { AppSidebar } from "./AppSidebar.tsx";
 import { OnlinePaymentForm } from "./OnlinePaymentForm.tsx";
 
 const appearance: Appearance | undefined = {
@@ -14,7 +13,7 @@ const loader = "auto";
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
 
-function App({ children }: { children: React.ReactNode }) {
+function App() {
   const [clientSecret, setClientSecret] = useState("");
 
   useEffect(() => {
@@ -34,7 +33,6 @@ function App({ children }: { children: React.ReactNode }) {
 
   return (
     <SidebarProvider>
-      <AppSidebar />
       <SidebarInset>
         <main>
           <h2 className="create-payment-header">Create Payment</h2>

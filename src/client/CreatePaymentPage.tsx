@@ -1,4 +1,5 @@
 import { Controller, useForm } from "react-hook-form";
+import { useLocation } from "react-router";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -42,7 +43,7 @@ import { CopyLinkInput } from "./CopyLinkInput.tsx";
 import { createPaymentLink } from "../api/paymentLinks.api.ts";
 import ReactCountryFlag from "react-country-flag";
 import { ButtonGroup } from "@/components/ui/button-group";
-import { buttonVariants } from "./components/ui/button.tsx";
+import { buttonVariants } from "@/components/ui/button";
 import { CreatePaymentBanner } from "./CreatePaymentBanner.tsx";
 
 const formSchema = z.object({
@@ -66,6 +67,7 @@ type FormValues = z.infer<typeof formSchema>;
 
 export function CreatePaymentPage() {
   const [slug, setSlug] = useState<String>();
+  const location = useLocation();
 
   const {
     handleSubmit,
@@ -99,7 +101,7 @@ export function CreatePaymentPage() {
   };
   return (
     <SidebarProvider>
-      <AppSidebar />
+      <AppSidebar pathname={location.pathname} />
       <SidebarInset>
         <main>
           <h2 className="create-payment-header">

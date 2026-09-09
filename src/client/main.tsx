@@ -7,14 +7,14 @@ import App from "./App.tsx";
 import { OnlinePaymentForm } from "./OnlinePaymentForm.tsx";
 import { CompletePage } from "./CompletePage.tsx";
 import { CreatePaymentPage } from "./CreatePaymentPage.tsx";
-import { OnlinePaymentCard } from "./OnlinePaymentCard.tsx";
+import { DashboardPage } from "./DashboardPage.tsx";
 import { AnalyticsPage } from "./AnalyticsPage.tsx";
 import { PublicPaymentPage } from "./payment/PublicPaymentPage.tsx";
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <OnlinePaymentCard />,
+    element: <DashboardPage />,
   },
   {
     path: "/create-payment",
@@ -40,7 +40,6 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    {/* <RouterProvider router={router} /> */}
-    <AnalyticsPage />
+    <RouterProvider router={router} />
   </React.StrictMode>,
 );

@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { useLocation } from "react-router";
 import {
   Card,
   CardContent,
@@ -11,9 +12,10 @@ import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "./AppSidebar.tsx";
 
 export function AnalyticsPage() {
+  const location = useLocation();
   return (
     <SidebarProvider>
-      <AppSidebar />
+      <AppSidebar pathname={location.pathname} />
       <SidebarInset>
         <main>
           <h2 className="create-payment-header">Create Payment</h2>

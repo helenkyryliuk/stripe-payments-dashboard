@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { useLocation } from "react-router";
 import {
   Card,
   CardContent,
@@ -11,10 +12,12 @@ import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "./AppSidebar.tsx";
 import { Rocket } from "lucide-react";
 
-export function OnlinePaymentCard() {
+export function DashboardPage() {
+  const location = useLocation();
   return (
     <SidebarProvider>
-      <AppSidebar />
+      const location = useLocation();
+      <AppSidebar pathname={location.pathname} />
       <SidebarInset>
         <main>
           <h2 className="create-payment-header">Create Payment</h2>
